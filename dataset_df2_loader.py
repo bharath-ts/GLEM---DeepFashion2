@@ -149,6 +149,7 @@ class DeepFashionDataset(torch.utils.data.Dataset):
         bbox = self.ds[i]['bbox']
         
         image, landmark_pos = self.bbox_crop(image, landmark_pos, bbox[0], bbox[1], bbox[2], bbox[3])
+        cropped_image_size = image.shape[:2]
         image, landmark_pos = self.rescale224square(image, landmark_pos)
         
         landmark_vis, landmark_in_pic, landmark_pos = self.check_landmarks(image, landmark_vis, landmark_in_pic, landmark_pos)
@@ -172,7 +173,8 @@ class DeepFashionDataset(torch.utils.data.Dataset):
         ret['landmark_map'] = gen_landmark_map(image_w, image_h, landmark_in_pic, landmark_pos, R)
         ret['landmark_map224'] = gen_landmark_map(image_w, image_h, landmark_in_pic, landmark_pos, R)
         ret['org_image_size'] = np.array(org_image_size)
-        ret['cropped_image_size'] = np.array([image_h, image_w])
+        ret['cropped_image_size'] = np.array(cropped_image_size)
+        ret['image_id'] = self.ds[i]['image_id']
         
         return ret
 
