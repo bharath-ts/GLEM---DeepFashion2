@@ -42,15 +42,15 @@ class Evaluator(object):
         lm_pos_y, lm_pos_x = np.unravel_index(torch.argmax(lm_pos_reshaped, dim=2).cpu().numpy(), (pred_h, pred_w))
         lm_pos_output = np.stack([lm_pos_x / (pred_w - 1), lm_pos_y / (pred_h - 1)], axis=2)
         
-        print("input", )
+        
         h, w = sample['cropped_image_size'][0]
         lm_pos_output_unn = np.stack([(lm_pos_x / (pred_w - 1)) * float(w), (lm_pos_y / (pred_h - 1))* float(h)], axis=2)
         lm_pos_output_unn = lm_pos_output_unn.astype(np.int64)
-        self.res = {'landmark_pos_normalized':sample['landmark_pos_normalized'],
-        'lm_pos_output_unn': lm_pos_output_unn}
+        self.res = {'image_id': sample['image_id'],
+            'landmark_pos':sample['landmark_pos'],
+            'lm_pos_output_unn': lm_pos_output_unn}
         self.lm_pos_output_unn_total.append(self.res)
-
-        
+      
         output_file = open('results_lm_out.pkl', 'wb')
         pickle.dump(self.lm_pos_output_unn_total, output_file)
 
@@ -63,7 +63,7 @@ class Evaluator(object):
         
     def evaluate(self):
         lm_dist = self.lm_dist_all / self.lm_vis_count_all
-        print(type(lm_dist))
+        #print(type(lm_dist))
         lm_dist[np.isnan(lm_dist)]=0
         lm_dist_all = lm_dist.mean()
         
